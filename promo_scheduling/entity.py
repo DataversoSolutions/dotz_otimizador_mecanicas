@@ -24,7 +24,9 @@ class Mechanic:
 class Promotion:
     partner: Partner
     mechanic: Mechanic
-    productivity_ref: int
+
+    def get_productivity_ref(self):
+        return 800
 
 
 class Schedule:
@@ -65,7 +67,7 @@ class Assignment:
     promotion: Promotion
 
     def get_productivity_at(self, start_day, num_days_since_start):
-        prod_ref = self.promotion.productivity_ref
+        prod_ref = self.promotion.get_productivity_ref()
 
         if start_day == 0:
             return 0
