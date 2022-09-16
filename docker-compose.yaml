@@ -7,3 +7,4 @@ services:
       - .:/app
     ports:
       - 5000:5000
+    entrypoint: gunicorn --bind 0.0.0.0:5000 promo_scheduling:app --timeout 90 --log-level debug
