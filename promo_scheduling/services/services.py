@@ -1,5 +1,5 @@
 from typing import List
-from promo_scheduling.entity import Partner, Mechanic, Promotion, SystemSettings
+from promo_scheduling.entities.entity import Partner, Mechanic, Promotion, SystemSettings
 
 
 class PartnerService:

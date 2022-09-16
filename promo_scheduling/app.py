@@ -1,11 +1,8 @@
 from promo_scheduling.services.services import PromotionService, PartnerService, MechanicService, get_system_settings
 from promo_scheduling.solver.solver import MechanicPartnerAssignmentSolver
-import yaml
 
 
-def main():
-    with open('input.yaml', 'r') as stream:
-        input_data = yaml.safe_load(stream)
+def promo_scheduling(input_data):
     print(input_data)
     system_settings = get_system_settings(input_data)
     partner_service = PartnerService.load_from_input(input_data)
@@ -23,10 +20,5 @@ def main():
         system_settings=system_settings
     )
     solver.run()
-    solver.print_solution()
-    solver.print_statistics()
-    solver.export_model('gitignore_model.txt')
-
-
-if __name__ == '__main__':
-    main()
+    solution = solver.get_solution()
+    return solution

@@ -2,7 +2,7 @@
 from typing import Dict, List
 from ortools.sat.python import cp_model
 
-from promo_scheduling.entity import (
+from promo_scheduling.entities.entity import (
     Assignment,
     Schedule,
     Mechanic,
@@ -166,9 +166,10 @@ class MechanicPartnerAssignmentSolver:
         self.create_objective_function()
         self.status = self.solver.Solve(self.model)
 
-    def print_solution(self) -> None:
+    def get_solution(self) -> None:
+        result = []
         if self.has_solution_found():
-            print('Solution:')
+            result.append('Solution:')
 
             output = []
             for promotion in self.possible_promotions:
@@ -181,15 +182,15 @@ class MechanicPartnerAssignmentSolver:
                 if productivity == 0:
                     continue
 
-                schedule_matrix = [
-                    [self.solver.Value(duration_array[i]) for i in range(len(duration_array))]
-                    for duration_array in assignment.schedule.schedule_array
-                ]
-                is_active = self.solver.Value(assignment.is_active)
-                not_is_active = self.solver.Value(assignment.not_is_active)
-                print(f"{assignment.id} is active={is_active} / not is active={not_is_active}")
-                for line in schedule_matrix:
-                    print(line)
+                # schedule_matrix = [
+                #     [self.solver.Value(duration_array[i]) for i in range(len(duration_array))]
+                #     for duration_array in assignment.schedule.schedule_array
+                # ]
+                # is_active = self.solver.Value(assignment.is_active)
+                # not_is_active = self.solver.Value(assignment.not_is_active)
+                # result.append(f"{assignment.id} is active={is_active} / not is active={not_is_active}")
+                # for line in schedule_matrix:
+                #    result.append(line)
                 output.append(
                     f"Parceiro {promotion.partner.name} "
                     f"com promoção {promotion.mechanic.name} "
@@ -197,10 +198,15 @@ class MechanicPartnerAssignmentSolver:
                     f"terminando em {end_var} "
                     f"com resultando em {productivity} clientes")
 
-            print(f'Optimal result: {self.solver.ObjectiveValue()} clientes')
-            print('\n'.join(output))
+            result.append(f'Optimal result: {self.solver.ObjectiveValue()} clientes')
+            result.append('\n'.join(output))
         else:
-            print('No solution found.')
+            result.append('No solution found.')
+        return '\n'.join(result)
+
+    def print_solution(self) -> None:
+        result = self.get_solution()
+        print(result)
 
     def print_statistics(self) -> None:
         print('\nStatistics')
