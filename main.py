@@ -1,4 +1,7 @@
-from promo_scheduling.services.services import PromotionService, PartnerService, MechanicService, get_system_settings
+from promo_scheduling.services.system_settings import get_system_settings
+from promo_scheduling.services.promotion_service import PromotionService
+from promo_scheduling.services.partner_service import PartnerService
+from promo_scheduling.services.mechanic_service import MechanicService
 from promo_scheduling.solver.solver import MechanicPartnerAssignmentSolver
 import yaml
 
