@@ -1,4 +1,5 @@
 ortools==9.3.10497
+google-cloud-bigquery==2.34.4
 flask-restful
 gunicorn
 flasgger
