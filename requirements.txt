@@ -4,3 +4,5 @@ flask-restful
 gunicorn
 flasgger
 flask-cors
+pandas
+pyarrow

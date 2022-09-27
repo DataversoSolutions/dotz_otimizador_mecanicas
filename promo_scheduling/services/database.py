@@ -25,7 +25,7 @@ class BigqueryDatabaseAdapter:
 
     @property
     def data_table_df(self):
-        if not self._data_table_df:
+        if self._data_table_df is None:
             self._data_table_df = self.client.query(
                 self.query.format(
                     project=self.project,
@@ -38,7 +38,7 @@ class BigqueryDatabaseAdapter:
 
     def productivity_base(self, partner_name, mechanic_name):
         df_filter = self.data_table_df.loc[(self.data_table_df['NomeParceiro'] == partner_name) & (
-            self.data_table_df['PromoAjust'].isin(mechanic_name))]
+            self.data_table_df['PromoAjust'].isin([mechanic_name]))]
         if df_filter['DistinctDays'].sum() == 0:
             result = 0
         else:
