@@ -35,6 +35,6 @@ class PromotionService:
             if partner.name in listed_partners:
                 continue
             for mechanic in mechanics_service.mechanics:
-                promotion = Promotion(partner, mechanic)
+                promotion = Promotion(partner, mechanic, database_adapter)
                 promotions.append(promotion)
         return cls(promotions)

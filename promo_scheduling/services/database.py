@@ -8,9 +8,7 @@ class PDatabaseAdapter(Protocol):
 
 
 class BigqueryDatabaseAdapter:
-    project = "dotzcloud-datalabs-datascience"
-    dataset_id = "DATA_SCIENCE_TEMP"
-    table_id = "OTIMIZADOR_DADOS"
+    query = "SELECT * FROM `{project}.{dataset_id}.{table_id}`"
 
     def __init__(self, project, dataset_id, table_id):
         self.project = project
@@ -28,10 +26,14 @@ class BigqueryDatabaseAdapter:
     @property
     def data_table_df(self):
         if not self._data_table_df:
-            dataset_ref = bigquery.DatasetReference(self.project, self.dataset_id)
-            table_ref = dataset_ref.table(self.table_id)
-            table = self.client.get_table(table_ref)
-            self._data_table_df = self.client.list_rows(table).to_dataframe()
+            self._data_table_df = self.client.query(
+                self.query.format(
+                    project=self.project,
+                    dataset_id=self.dataset_id,
+                    table_id=self.table_id
+                )
+            ).to_dataframe()
+
         return self._data_table_df
 
     def productivity_base(self, partner_name, mechanic_name):
