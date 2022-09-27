@@ -2,6 +2,7 @@ from typing import List
 from promo_scheduling.entities.entity import Promotion
 from promo_scheduling.services.partner_service import PartnerService
 from promo_scheduling.services.mechanic_service import MechanicService
+from promo_scheduling.services.database import PDatabaseAdapter
 
 
 class PromotionService:
@@ -13,7 +14,8 @@ class PromotionService:
         cls,
         input_data,
         partner_service: PartnerService,
-        mechanics_service: MechanicService
+        mechanics_service: MechanicService,
+        database_adapter: PDatabaseAdapter
     ) -> 'PromotionService':
         possible_promotions = input_data['mecanicas_elegiveis']
         listed_partners = []
@@ -26,7 +28,7 @@ class PromotionService:
                     partner = partner_service.get_partner_by_name(partner_name)
                     mechanic = mechanics_service.get_mechanic_by_name(mechanic_name)
                     promotion = Promotion(
-                        partner, mechanic
+                        partner, mechanic, database_adapter
                     )
                     promotions.append(promotion)
         for partner in partner_service.partners:

@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from typing import List
+from promo_scheduling.services.database import PDatabaseAdapter
 from ortools.sat.python import cp_model
 
 
@@ -24,9 +25,10 @@ class Mechanic:
 class Promotion:
     partner: Partner
     mechanic: Mechanic
+    database_adapter: PDatabaseAdapter
 
     def get_productivity_ref(self):
-        return 800
+        return self.database_adapter.productivity_base(self.partner.name, self.mechanic.name)
 
 
 class Schedule:
@@ -69,12 +71,20 @@ class Assignment:
     def get_productivity_at(self, start_day, num_days_since_start):
         prod_ref = self.promotion.get_productivity_ref()
 
-        if start_day == 0:
-            return 0
         if num_days_since_start == 0:
-            return prod_ref * 1
+            return prod_ref * 0.5555
         elif num_days_since_start == 1:
-            return prod_ref * 2
+            return prod_ref * 0.7788
+        elif num_days_since_start == 2:
+            return prod_ref * 0.9930
+        elif num_days_since_start == 3:
+            return prod_ref * 1.0000
+        elif num_days_since_start == 4:
+            return prod_ref * 0.5547
+        elif num_days_since_start == 5:
+            return prod_ref * 0.4201
+        elif num_days_since_start == 6:
+            return prod_ref * 0.2962
         else:
             return prod_ref
 
