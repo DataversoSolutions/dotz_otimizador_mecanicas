@@ -1,5 +1,4 @@
 from typing import Protocol
-import pandas as pd
 from google.cloud import bigquery
 
 
@@ -17,7 +16,7 @@ class BigqueryDatabaseAdapter:
         self.project = project
         self.dataset_id = dataset_id
         self.table_id = table_id
-        self._data_table_df: pd.DataFrame = None
+        self._data_table_df = None
         self._client = None
 
     @property
@@ -36,7 +35,7 @@ class BigqueryDatabaseAdapter:
         return self._data_table_df
 
     def productivity_base(self, partner_name, mechanic_name):
-        df_filter = self.data_table_df.loc[(df['NomeParceiro'] == partner_name) & (
+        df_filter = self.data_table_df.loc[(self.data_table_df['NomeParceiro'] == partner_name) & (
             self.data_table_df['PromoAjust'].isin(mechanic_name))]
         if df_filter['DistinctDays'].sum() == 0:
             result = 0
