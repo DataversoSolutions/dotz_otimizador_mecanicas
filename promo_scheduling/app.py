@@ -1,34 +1,10 @@
-from promo_scheduling.services.system_settings import get_system_settings
-from promo_scheduling.services.promotion_service import PromotionService
-from promo_scheduling.services.partner_service import PartnerService
-from promo_scheduling.services.mechanic_service import MechanicService
-from promo_scheduling.services.database import BigqueryDatabaseAdapter
-from promo_scheduling.solver.solver import MechanicPartnerAssignmentSolver
+from flask import Flask
+from flask_cors import CORS
+from promo_scheduling.settings import APP_NAME
+from promo_scheduling.api_v1 import create_api as create_api_v1
+from promo_scheduling.api_v2 import create_api as create_api_v2
 
-
-def promo_scheduling(input_data):
-    print(input_data)
-    system_settings = get_system_settings(input_data)
-    database_adapter = BigqueryDatabaseAdapter(
-        project="dotzcloud-datalabs-datascience",
-        dataset_id="DATA_SCIENCE_TEMP",
-        table_id="OTIMIZADOR_DADOS"
-    )
-    partner_service = PartnerService.load_from_input(input_data)
-    mechanic_service = MechanicService.load_from_input(input_data)
-    promo_service = PromotionService.load_from_input(
-        input_data=input_data,
-        partner_service=partner_service,
-        mechanics_service=mechanic_service,
-        database_adapter=database_adapter
-
-    )
-    solver = MechanicPartnerAssignmentSolver(
-        possible_promotions=promo_service.promotions,
-        partners=partner_service.partners,
-        mechanics=mechanic_service.mechanics,
-        system_settings=system_settings
-    )
-    solver.run()
-    solution = solver.get_solution()
-    return solution
+app = Flask(APP_NAME)
+CORS(app)
+create_api_v1(app)
+create_api_v2(app)

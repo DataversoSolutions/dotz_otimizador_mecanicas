@@ -1,1 +1,1 @@
-from promo_scheduling.api import app  # noqa
+from promo_scheduling.app import app  # noqa

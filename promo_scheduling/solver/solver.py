@@ -1,6 +1,7 @@
 
 from typing import Dict, List
 from ortools.sat.python import cp_model
+import json
 
 from promo_scheduling.entities.entity import (
     Assignment,
@@ -166,7 +167,33 @@ class MechanicPartnerAssignmentSolver:
         self.create_objective_function()
         self.status = self.solver.Solve(self.model)
 
-    def get_solution(self) -> None:
+    def get_solution_json(self) -> str:
+        solution = {}
+        if not self.has_solution_found():
+            solution['status'] = "Solution not found"
+            return json.dumps(solution)
+        promotion_assignments = []
+        for promotion in self.possible_promotions:
+            promotion_assignment = {}
+            partner = promotion.partner
+            mechanic = promotion.mechanic
+            assignment = self.all_assignments[f'{partner.name}_{mechanic.name}']
+            start_var = self.solver.Value(assignment.start)
+            end_var = self.solver.Value(assignment.end)
+            productivity = self.solver.Value(assignment.productivity())
+            if productivity == 0:
+                continue
+            promotion_assignment['partner'] = promotion.partner.name
+            promotion_assignment['mechanic'] = promotion.mechanic.name
+            promotion_assignment['start'] = start_var
+            promotion_assignment['end'] = end_var
+            promotion_assignment['productivity'] = productivity
+            promotion_assignments.append(promotion_assignment)
+        solution['status'] = "Solution found"
+        solution['promotion_assignments'] = promotion_assignments
+        return solution
+
+    def get_solution_str(self) -> str:
         result = []
         if self.has_solution_found():
             result.append('Solution:')
@@ -205,7 +232,7 @@ class MechanicPartnerAssignmentSolver:
         return '\n'.join(result)
 
     def print_solution(self) -> None:
-        result = self.get_solution()
+        result = self.get_solution_str()
         print(result)
 
     def print_statistics(self) -> None:
