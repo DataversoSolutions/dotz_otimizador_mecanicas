@@ -190,6 +190,7 @@ class MechanicPartnerAssignmentSolver:
             promotion_assignment['productivity'] = productivity
             promotion_assignments.append(promotion_assignment)
         solution['status'] = "Solution found"
+        solution['total_clients'] = self.solver.ObjectiveValue()
         solution['promotion_assignments'] = promotion_assignments
         return solution
 
