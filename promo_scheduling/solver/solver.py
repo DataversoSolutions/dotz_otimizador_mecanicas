@@ -5,12 +5,12 @@ import json
 from promo_scheduling.entities.entity import (
     Assignment,
     Schedule,
-    Mechanic,
     Partner,
     Promotion,
     SystemSettings,
 )
 from promo_scheduling.services.logging import logger
+from promo_scheduling.settings import WEEKDAY_INDEX
 
 
 class MechanicPartnerAssignmentSolver:
@@ -18,17 +18,16 @@ class MechanicPartnerAssignmentSolver:
         self,
         possible_promotions: List[Promotion],
         partners: List[Partner],
-        mechanics: List[Mechanic],
         system_settings: SystemSettings,
     ) -> None:
         self.possible_promotions = possible_promotions
         self.partners = partners
-        self.mechanics = mechanics
         self.system_settings = system_settings
         self.model = cp_model.CpModel()
         self.solver = cp_model.CpSolver()
         logger.debug(f"{self.solver.parameters}")
         self.all_assignments: Dict[str, Assignment] = {}
+        self.zero_day_week_day = WEEKDAY_INDEX[system_settings.starting_week_day]
 
     def create_promo_interval_var(self, relation_id, duration_horizon):
         start_var = self.model.NewIntVar(0, duration_horizon, "start_" + relation_id)
@@ -98,22 +97,9 @@ class MechanicPartnerAssignmentSolver:
                     self.all_assignments[
                         f"{partner.name}_{mechanic.name}"
                     ].interval.SizeExpr()
-                    for mechanic in self.mechanics
+                    for mechanic in partner.mechanics
                 )
                 <= partner.availability
-            )
-
-    def add_constraint_promo_max_duration(self) -> None:
-        for mechanic in self.mechanics:
-            # the sum of all partner with this mechanic must be equals or lower than the mechanic availability
-            self.model.Add(
-                sum(
-                    self.all_assignments[
-                        f"{partner.name}_{mechanic.name}"
-                    ].interval.SizeExpr()
-                    for partner in self.partners
-                )
-                <= mechanic.availability
             )
 
     def add_constraint_min_duration(self) -> None:
@@ -151,7 +137,7 @@ class MechanicPartnerAssignmentSolver:
             # so, the intervals variables must not overlap
             self.model.AddNoOverlap(
                 self.all_assignments[f"{partner.name}_{mechanic.name}"].interval
-                for mechanic in self.mechanics
+                for mechanic in partner.mechanics
             )
 
     def add_constraint_promotion_end_before_availability_end(self):
@@ -166,7 +152,7 @@ class MechanicPartnerAssignmentSolver:
         self.model.Maximize(
             # we maximize the productivity (clients) of all promotions
             sum(
-                assignment.productivity()
+                assignment.productivity(self.zero_day_week_day)
                 for assignment in self.all_assignments.values()
             )
         )
@@ -187,7 +173,6 @@ class MechanicPartnerAssignmentSolver:
         self.create_variables()
         self.add_schedule_constraint()
         self.add_constraint_partner_max_availability()
-        self.add_constraint_promo_max_duration()
         self.add_constraint_no_overlapping_promotion_on_partner()
         self.add_constraint_min_duration()
         self.add_constraint_promotion_end_before_availability_end()
@@ -233,7 +218,9 @@ class MechanicPartnerAssignmentSolver:
                 assignment = self.all_assignments[f"{partner.name}_{mechanic.name}"]
                 start_var = self.solver.Value(assignment.start)
                 end_var = self.solver.Value(assignment.end)
-                productivity = self.solver.Value(assignment.productivity())
+                productivity = self.solver.Value(
+                    assignment.productivity(self.zero_day_week_day)
+                )
                 # if productivity == 0:
                 #     continue
 

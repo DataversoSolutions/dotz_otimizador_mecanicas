@@ -4,13 +4,15 @@ from promo_scheduling.services.partner_service import PartnerService
 from promo_scheduling.services.mechanic_service import MechanicService
 from promo_scheduling.services.database import BigqueryDatabaseAdapter
 from promo_scheduling.solver.solver import MechanicPartnerAssignmentSolver
-from promo_scheduling.settings import PROJECT, DATASET_ID, TABLE_ID
+from promo_scheduling.settings import conf
 
 
 def promo_scheduling(input_data, ret_type="str"):
     system_settings = get_system_settings(input_data)
     database_adapter = BigqueryDatabaseAdapter(
-        project=PROJECT, dataset_id=DATASET_ID, table_id=TABLE_ID
+        project=conf.database_project,
+        dataset_id=conf.database_dataset,
+        table_id=conf.database_table,
     )
     partner_service = PartnerService.load_from_input(input_data)
     mechanic_service = MechanicService.load_from_input(input_data)

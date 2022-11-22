@@ -2,23 +2,30 @@ from dataclasses import dataclass
 from typing import List
 from promo_scheduling.services.database import PDatabaseAdapter
 from ortools.sat.python import cp_model
+from promo_scheduling.utils.weights_func import (
+    get_week_weight,
+    get_weekday_weight,
+    get_duration_weight,
+)
 
 
 @dataclass
 class SystemSettings:
+    starting_week_day: int = 0
     min_duration: int = 3
-
-
-@dataclass
-class Partner:
-    name: str
-    availability: int = 1
 
 
 @dataclass
 class Mechanic:
     name: str
-    availability: int = 1
+    availability: int
+
+
+@dataclass
+class Partner:
+    name: str
+    availability: int
+    mechanics: list[Mechanic]
 
 
 @dataclass
@@ -74,32 +81,23 @@ class Assignment:
     def __post_init__(self):
         self.prod_ref = self.promotion.get_productivity_ref()
 
-    def get_productivity_at(self, start_day, num_days_since_start):
+    def get_productivity_at(self, zero_day_week_day, start_day, num_days_since_start):
+        return round(
+            self.prod_ref
+            * get_week_weight(start_day, num_days_since_start)
+            * get_weekday_weight(zero_day_week_day, start_day)
+            * get_duration_weight(num_days_since_start)
+        )
 
-        if num_days_since_start == 0:
-            return self.prod_ref * 0.5555
-        elif num_days_since_start == 1:
-            return self.prod_ref * 0.7788
-        elif num_days_since_start == 2:
-            return self.prod_ref * 0.9930
-        elif num_days_since_start == 3:
-            return self.prod_ref * 1.0000
-        elif num_days_since_start == 4:
-            return self.prod_ref * 0.5547
-        elif num_days_since_start == 5:
-            return self.prod_ref * 0.4201
-        elif num_days_since_start == 6:
-            return self.prod_ref * 0.2962
-        else:
-            return self.prod_ref * 0.2962
-
-    def productivity(self):
+    def productivity(self, zero_day_week_day):
         ret = 0
         for starting_day, duration_array in enumerate(self.schedule.schedule_array):
             coefs = []
             for num_days in range(len(duration_array)):
                 productivity = self.get_productivity_at(
-                    start_day=starting_day, num_days_since_start=num_days
+                    zero_day_week_day=zero_day_week_day,
+                    start_day=starting_day,
+                    num_days_since_start=num_days,
                 )
                 coefs.append(productivity)
             ret += cp_model.LinearExpr.WeightedSum(duration_array, coefs)
