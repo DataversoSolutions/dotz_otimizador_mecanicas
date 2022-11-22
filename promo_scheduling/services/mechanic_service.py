@@ -14,13 +14,12 @@ class MechanicService:
         return self.mechanics_map[name]
 
     @classmethod
-    def load_from_input(cls, input_data) -> 'MechanicService':
-        mechanics_input = input_data['mecanicas']
+    def load_from_input(cls, input_data) -> "MechanicService":
+        mechanics_input = input_data["mecanicas"]
         mechanics = []
         for partner_input in mechanics_input:
             partner = Mechanic(
-                name=partner_input['id'],
-                availability=partner_input['dias_disponiveis']
+                name=partner_input["id"], availability=partner_input["dias_disponiveis"]
             )
             mechanics.append(partner)
         return cls(mechanics)

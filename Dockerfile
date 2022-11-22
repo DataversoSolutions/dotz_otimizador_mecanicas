@@ -23,4 +23,4 @@ RUN pip install pytest pytest-cov coverage pylint
 RUN pip install --no-cache-dir -r requirements.txt
 
 EXPOSE 5000
-CMD [ "gunicorn", "--bind" , "0.0.0.0:5000", "promo_scheduling:app" ] 
+CMD [ "gunicorn", "--bind" , "0.0.0.0:5000", "promo_scheduling:app" ]

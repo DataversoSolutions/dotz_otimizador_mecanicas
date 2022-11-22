@@ -1,5 +1,6 @@
 # all file with prefix gitignore
 gitignore*
+promo_scheduling/conf.ini
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

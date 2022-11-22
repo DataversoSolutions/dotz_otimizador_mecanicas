@@ -7,7 +7,7 @@ import yaml
 
 
 def main():
-    with open('input.yaml', 'r') as stream:
+    with open("input.yaml", "r") as stream:
         input_data = yaml.safe_load(stream)
     print(input_data)
     system_settings = get_system_settings(input_data)
@@ -16,20 +16,19 @@ def main():
     promo_service = PromotionService.load_from_input(
         input_data=input_data,
         partner_service=partner_service,
-        mechanics_service=mechanic_service
-
+        mechanics_service=mechanic_service,
     )
     solver = MechanicPartnerAssignmentSolver(
         possible_promotions=promo_service.promotions,
         partners=partner_service.partners,
         mechanics=mechanic_service.mechanics,
-        system_settings=system_settings
+        system_settings=system_settings,
     )
     solver.run()
     solver.print_solution()
     solver.print_statistics()
-    solver.export_model('gitignore_model.txt')
+    solver.export_model("gitignore_model.txt")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

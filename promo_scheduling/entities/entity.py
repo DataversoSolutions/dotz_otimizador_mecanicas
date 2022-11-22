@@ -28,7 +28,9 @@ class Promotion:
     database_adapter: PDatabaseAdapter
 
     def get_productivity_ref(self):
-        return self.database_adapter.productivity_base(self.partner.name, self.mechanic.name)
+        return self.database_adapter.productivity_base(
+            self.partner.name, self.mechanic.name
+        )
 
 
 class Schedule:
@@ -45,8 +47,9 @@ class Schedule:
     def __init__(self, name, model: cp_model.CpModel, length):
         self.length = length
         self.schedule_array = [
-            [model.NewBoolVar(f'{name}_[{i},{j}]') for i in range(length)]
-            for j in range(length)]
+            [model.NewBoolVar(f"{name}_[{i},{j}]") for i in range(length)]
+            for j in range(length)
+        ]
 
     def get_duration_array_at_day(self, day):
         return self.schedule_array[day]
@@ -96,8 +99,7 @@ class Assignment:
             coefs = []
             for num_days in range(len(duration_array)):
                 productivity = self.get_productivity_at(
-                    start_day=starting_day,
-                    num_days_since_start=num_days
+                    start_day=starting_day, num_days_since_start=num_days
                 )
                 coefs.append(productivity)
             ret += cp_model.LinearExpr.WeightedSum(duration_array, coefs)

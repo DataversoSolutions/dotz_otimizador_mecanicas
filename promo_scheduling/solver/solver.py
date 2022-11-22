@@ -27,7 +27,7 @@ class MechanicPartnerAssignmentSolver:
         self.system_settings = system_settings
         self.model = cp_model.CpModel()
         self.solver = cp_model.CpSolver()
-        self.solver.parameters.log_search_progress = True
+        logger.debug(f"{self.solver.parameters}")
         self.all_assignments: Dict[str, Assignment] = {}
 
     def create_promo_interval_var(self, relation_id, duration_horizon):

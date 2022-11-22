@@ -14,13 +14,12 @@ class PartnerService:
         return self.partners_map[name]
 
     @classmethod
-    def load_from_input(cls, input_data) -> 'PartnerService':
-        partners_input = input_data['parceiros']
+    def load_from_input(cls, input_data) -> "PartnerService":
+        partners_input = input_data["parceiros"]
         partners = []
         for partner_input in partners_input:
             partner = Partner(
-                name=partner_input['id'],
-                availability=partner_input['dias_possiveis']
+                name=partner_input["id"], availability=partner_input["dias_possiveis"]
             )
             partners.append(partner)
         return cls(partners)
