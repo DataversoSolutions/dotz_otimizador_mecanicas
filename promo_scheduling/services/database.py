@@ -42,8 +42,8 @@ class BigqueryDatabaseAdapter:
             (self.data_table_df["NomeParceiro"] == partner_name)
             & (self.data_table_df["PromoAjust"].isin([mechanic_name]))
         ]
-        if df_filter["DistinctDays"].sum() == 0:
+        if df_filter["Days"].sum() == 0:
             result = 0
         else:
-            result = df_filter["Clientes"].sum() / df_filter["DistinctDays"].sum()
+            result = df_filter["Clientes"].sum() / df_filter["Days"].sum()
         return result
