@@ -15,17 +15,13 @@ def promo_scheduling(input_data, ret_type="str"):
         table_id=conf.database_table,
     )
     partner_service = PartnerService.load_from_input(input_data)
-    mechanic_service = MechanicService.load_from_input(input_data)
     promo_service = PromotionService.load_from_input(
-        input_data=input_data,
         partner_service=partner_service,
-        mechanics_service=mechanic_service,
         database_adapter=database_adapter,
     )
     solver = MechanicPartnerAssignmentSolver(
         possible_promotions=promo_service.promotions,
         partners=partner_service.partners,
-        mechanics=mechanic_service.mechanics,
         system_settings=system_settings,
     )
     solver.run()
