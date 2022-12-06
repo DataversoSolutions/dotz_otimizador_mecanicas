@@ -57,7 +57,7 @@ class MechanicPartnerAssignmentSolver:
         for promotion in self.possible_promotions:
             partner = promotion.partner
             mechanic = promotion.mechanic
-            schedule_dim_size = partner.availability
+            partner_availability = partner.availability
             relation_id = f"{partner.name}_{mechanic.name}"
 
             (
@@ -74,7 +74,10 @@ class MechanicPartnerAssignmentSolver:
             )
 
             schedule = Schedule(
-                name=relation_id, model=self.model, length=schedule_dim_size
+                name=relation_id,
+                model=self.model,
+                num_days=partner_availability,
+                promo_lenght=mechanic.availability,
             )
 
             self.all_assignments[relation_id] = Assignment(
@@ -112,10 +115,11 @@ class MechanicPartnerAssignmentSolver:
     def add_schedule_constraint(self) -> None:
         for assignment in self.all_assignments.values():
             schedule = assignment.schedule
-            schedule_length = schedule.length
+            schedule_days = schedule.num_days
+            schedule_promo_duration = schedule.promo_lenght
             start_var = assignment.start
             duration_var = assignment.duration
-            for day in range(schedule_length):
+            for day in range(schedule_days):
                 duration_array = schedule.get_duration_array_at_day(day)
                 day_flags = schedule.get_day_flags_var()
                 # enforce the day_flags[start_var] == 1
@@ -124,11 +128,11 @@ class MechanicPartnerAssignmentSolver:
                 # only one day active
                 self.model.AddAtMostOne(day_flags)
                 # enforce duration if day is active
-                self.model.Add(sum(duration_array) == duration_var).OnlyEnforceIf(
+                self.model.Add(sum(duration_array) == duration_var + 1).OnlyEnforceIf(
                     day_flags[day]
                 )
                 # enforce the duration array is a vector with all ones in the beginning
-                for pos in range(schedule_length - 1):
+                for pos in range(schedule_promo_duration - 1):
                     self.model.Add(duration_array[pos] >= duration_array[pos + 1])
 
     def add_constraint_no_overlapping_promotion_on_partner(self):
@@ -175,7 +179,7 @@ class MechanicPartnerAssignmentSolver:
         self.add_constraint_partner_max_availability()
         self.add_constraint_no_overlapping_promotion_on_partner()
         self.add_constraint_min_duration()
-        self.add_constraint_promotion_end_before_availability_end()
+        # self.add_constraint_promotion_end_before_availability_end()
         self.create_objective_function()
         self.status = self.solver.Solve(self.model)
 
@@ -218,6 +222,7 @@ class MechanicPartnerAssignmentSolver:
                 assignment = self.all_assignments[f"{partner.name}_{mechanic.name}"]
                 start_var = self.solver.Value(assignment.start)
                 end_var = self.solver.Value(assignment.end)
+                duration_var = self.solver.Value(assignment.duration)
                 productivity = self.solver.Value(
                     assignment.productivity(self.zero_day_week_day)
                 )
@@ -243,6 +248,7 @@ class MechanicPartnerAssignmentSolver:
                     f"com promoção {promotion.mechanic.name} "
                     f"iniciando em {start_var} e "
                     f"terminando em {end_var} "
+                    f"com duração de {duration_var} "
                     f"com resultando em {productivity} clientes"
                 )
 

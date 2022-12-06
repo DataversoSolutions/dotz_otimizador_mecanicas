@@ -51,11 +51,12 @@ class Schedule:
     # this example means a duration of 2 days, starting at day 2
     schedule_array: List[List[cp_model.IntVar]]
 
-    def __init__(self, name, model: cp_model.CpModel, length):
-        self.length = length
+    def __init__(self, name, model: cp_model.CpModel, num_days, promo_lenght):
+        self.promo_lenght = promo_lenght
+        self.num_days = num_days
         self.schedule_array = [
-            [model.NewBoolVar(f"{name}_[{i},{j}]") for i in range(length)]
-            for j in range(length)
+            [model.NewBoolVar(f"{name}_[{i},{j}]") for i in range(promo_lenght)]
+            for j in range(num_days)
         ]
 
     def get_duration_array_at_day(self, day):
@@ -82,12 +83,16 @@ class Assignment:
         self.prod_ref = self.promotion.get_productivity_ref()
 
     def get_productivity_at(self, zero_day_week_day, start_day, num_days_since_start):
-        return round(
+        productivity = round(
             self.prod_ref
             * get_week_weight(start_day, num_days_since_start)
             * get_weekday_weight(zero_day_week_day, start_day)
             * get_duration_weight(num_days_since_start)
         )
+        # print(
+        #     f"{self.id}: {zero_day_week_day=} {start_day=} {num_days_since_start=} {productivity=}"
+        # )
+        return productivity
 
     def productivity(self, zero_day_week_day):
         ret = 0
