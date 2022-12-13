@@ -19,7 +19,8 @@ class MechanicService:
         mechanics = []
         for partner_input in mechanics_input:
             partner = Mechanic(
-                name=partner_input["id"], availability=partner_input["dias_disponiveis"]
+                name=partner_input["id"],
+                availability=partner_input["dias_disponiveis"] + 1,
             )
             mechanics.append(partner)
         return cls(mechanics)

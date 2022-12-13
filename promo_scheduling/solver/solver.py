@@ -194,8 +194,8 @@ class MechanicPartnerAssignmentSolver:
             partner = promotion.partner
             mechanic = promotion.mechanic
             assignment = self.all_assignments[f"{partner.name}_{mechanic.name}"]
-            start_var = self.solver.Value(assignment.start)
-            end_var = self.solver.Value(assignment.end)
+            start_var = self.solver.Value(assignment.start) - 1
+            end_var = self.solver.Value(assignment.end) - 1
             productivity = self.solver.Value(assignment.productivity())
             if productivity == 0:
                 continue
@@ -220,8 +220,8 @@ class MechanicPartnerAssignmentSolver:
                 partner = promotion.partner
                 mechanic = promotion.mechanic
                 assignment = self.all_assignments[f"{partner.name}_{mechanic.name}"]
-                start_var = self.solver.Value(assignment.start)
-                end_var = self.solver.Value(assignment.end)
+                start_var = self.solver.Value(assignment.start) - 1
+                end_var = self.solver.Value(assignment.end) - 1
                 duration_var = self.solver.Value(assignment.duration)
                 productivity = self.solver.Value(
                     assignment.productivity(self.zero_day_week_day)

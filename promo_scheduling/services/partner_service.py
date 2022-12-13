@@ -24,7 +24,7 @@ class PartnerService:
             for mechanic_input in mechanics_input:
                 mechanic = Mechanic(
                     name=mechanic_input["id"],
-                    availability=mechanic_input["dias_disponiveis"],
+                    availability=mechanic_input["dias_disponiveis"] + 1,
                 )
                 mechanics.append(mechanic)
             partner = Partner(

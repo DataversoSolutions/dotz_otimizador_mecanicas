@@ -17,6 +17,9 @@ def get_weekday_weight(zero_day_week_day, start_day):
 
 
 def get_duration_weight(num_days_since_start):
+    if num_days_since_start == 0:
+        return 0
+    num_days_since_start = num_days_since_start - 1
     weights = conf.duration_weights
     # get the last value if its index is greater than the weights
     duration = num_days_since_start if num_days_since_start < len(weights) else -1
