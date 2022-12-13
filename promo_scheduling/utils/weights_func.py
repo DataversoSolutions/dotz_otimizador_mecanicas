@@ -10,8 +10,8 @@ def get_week_weight(start_day, num_days_since_start):
     return weight
 
 
-def get_weekday_weight(zero_day_week_day, start_day):
-    weekday = (zero_day_week_day + start_day) % 7
+def get_weekday_weight(zero_day_week_day, start_day, num_days_since_start):
+    weekday = (zero_day_week_day + start_day + num_days_since_start) % 7
     weights = conf.weekday_weights
     return weights[weekday]
 

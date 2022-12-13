@@ -86,7 +86,7 @@ class Assignment:
         productivity = round(
             self.prod_ref
             * get_week_weight(start_day, num_days_since_start)
-            * get_weekday_weight(zero_day_week_day, start_day)
+            * get_weekday_weight(zero_day_week_day, start_day, num_days_since_start)
             * get_duration_weight(num_days_since_start)
         )
         # print(
