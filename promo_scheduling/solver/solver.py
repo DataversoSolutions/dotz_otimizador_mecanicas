@@ -94,7 +94,7 @@ class MechanicPartnerAssignmentSolver:
 
     def add_constraint_partner_max_availability(self) -> None:
         for partner in self.partners:
-            # the sum of all mechanics of the partner must be equals or lower than the partner availability
+            # the sum of all mechanics of the partner must be equal or lower than the partner availability
             self.model.Add(
                 sum(
                     self.all_assignments[
@@ -138,7 +138,7 @@ class MechanicPartnerAssignmentSolver:
     def add_constraint_no_overlapping_promotion_on_partner(self):
         for partner in self.partners:
             # the partner cant have more than one promotion running at any time
-            # so, the intervals variables must not overlap
+            # so, the interval variables must not overlap
             self.model.AddNoOverlap(
                 self.all_assignments[f"{partner.name}_{mechanic.name}"].interval
                 for mechanic in partner.mechanics
