@@ -4,14 +4,15 @@ Content-Type: application/json
 {
   "configuracoes_do_sistema": {
     "mecanicas": {
-      "dias_duracao_minima": 3,
-      "dia_da_semana_inicial": "domingo"
+      "dias_duracao_minima": 0,
+      "dia_da_semana_inicial": "quinta",
+      "maximo_promocoes_no_mesmo_dia": 2
     }
   },
   "parceiros": [
     {
       "id": "AMAZON",
-      "dias_possiveis": 7,
+      "dias_possiveis": 9,
       "mecanicas": [
         {
           "id": "DZ_4",
@@ -21,17 +22,17 @@ Content-Type: application/json
     },
     {
       "id": "Magazine Luiza.com",
-      "dias_possiveis": 7,
+      "dias_possiveis": 9,
       "mecanicas": [
         {
           "id": "DZ_4",
-          "dias_disponiveis": 4
+          "dias_disponiveis": 5
         }
       ]
     },
     {
       "id": "Americanas.com",
-      "dias_possiveis": 7,
+      "dias_possiveis": 9,
       "mecanicas": [
         {
           "id": "DZ_4",
@@ -41,7 +42,7 @@ Content-Type: application/json
     },
     {
       "id": "Submarino",
-      "dias_possiveis": 7,
+      "dias_possiveis": 9,
       "mecanicas": [
         {
           "id": "DZ_4",

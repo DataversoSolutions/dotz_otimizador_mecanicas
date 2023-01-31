@@ -99,7 +99,7 @@ class MechanicPartnerAssignmentSolver:
                 sum(
                     self.all_assignments[
                         f"{partner.name}_{mechanic.name}"
-                    ].interval.SizeExpr()
+                    ].duration
                     for mechanic in partner.mechanics
                 )
                 <= partner.availability
@@ -119,9 +119,11 @@ class MechanicPartnerAssignmentSolver:
             schedule_promo_duration = schedule.promo_lenght
             start_var = assignment.start
             duration_var = assignment.duration
+            day_flags = schedule.get_day_flags_var()
+            # only one day active
+            self.model.AddAtMostOne(day_flags)
             for day in range(schedule_days):
                 duration_array = schedule.get_duration_array_at_day(day)
-                day_flags = schedule.get_day_flags_var()
                 # enforce the day_flags[start_var] == 1
                 self.model.AddMapDomain(var=start_var, bool_var_array=day_flags)
 
@@ -152,6 +154,14 @@ class MechanicPartnerAssignmentSolver:
                 <= possible_assignment.promotion.partner.availability
             )
 
+    def add_constraint_daily_promotions(self):
+        promotions_intervals = []
+        promotions_demands = []
+        for assignment in self.all_assignments.values():
+            promotions_intervals.append(assignment.interval)
+            promotions_demands.append(1)
+        self.model.AddCumulative(promotions_intervals, promotions_demands, self.system_settings.max_daily_promotions)
+
     def create_objective_function(self) -> None:
         self.model.Maximize(
             # we maximize the productivity (clients) of all promotions
@@ -180,6 +190,7 @@ class MechanicPartnerAssignmentSolver:
         self.add_constraint_no_overlapping_promotion_on_partner()
         self.add_constraint_min_duration()
         # self.add_constraint_promotion_end_before_availability_end()
+        self.add_constraint_daily_promotions()
         self.create_objective_function()
         self.status = self.solver.Solve(self.model)
 

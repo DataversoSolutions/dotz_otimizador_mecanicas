@@ -13,6 +13,7 @@ from promo_scheduling.utils.weights_func import (
 class SystemSettings:
     starting_week_day: int = 0
     min_duration: int = 3
+    max_daily_promotions: int = 5
 
 
 @dataclass
