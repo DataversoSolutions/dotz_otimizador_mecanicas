@@ -29,11 +29,11 @@ class MechanicPartnerAssignmentSolver:
         self.all_assignments: Dict[str, Assignment] = {}
         self.zero_day_week_day = WEEKDAY_INDEX[system_settings.starting_week_day]
 
-    def create_promo_interval_var(self, relation_id, duration_horizon):
-        start_var = self.model.NewIntVar(0, duration_horizon, "start_" + relation_id)
-        end_var = self.model.NewIntVar(0, duration_horizon, "end_" + relation_id)
+    def create_promo_interval_var(self, relation_id, availability_horizon):
+        start_var = self.model.NewIntVar(0, availability_horizon, "start_" + relation_id)
+        end_var = self.model.NewIntVar(0, availability_horizon, "end_" + relation_id)
         duration_var = self.model.NewIntVar(
-            0, duration_horizon, "duration_" + relation_id
+            0, availability_horizon, "duration_" + relation_id
         )
         interval_var = self.model.NewIntervalVar(
             start_var, duration_var, end_var, "interval_" + relation_id
@@ -51,8 +51,8 @@ class MechanicPartnerAssignmentSolver:
         return is_active, not_is_active
 
     def create_variables(self) -> None:
-        duration_horizon = max(
-            promotion.mechanic.availability for promotion in self.possible_promotions
+        availability_horizon = max(
+            promotion.partner.availability for promotion in self.possible_promotions
         )
         for promotion in self.possible_promotions:
             partner = promotion.partner
@@ -66,7 +66,7 @@ class MechanicPartnerAssignmentSolver:
                 duration_var,
                 interval_var,
             ) = self.create_promo_interval_var(
-                relation_id=relation_id, duration_horizon=duration_horizon
+                relation_id=relation_id, availability_horizon=availability_horizon
             )
 
             is_active, not_is_active = self.create_promo_active_flag_var(
