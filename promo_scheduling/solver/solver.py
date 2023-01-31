@@ -77,7 +77,7 @@ class MechanicPartnerAssignmentSolver:
                 name=relation_id,
                 model=self.model,
                 num_days=partner_availability,
-                promo_lenght=mechanic.availability,
+                promo_length=mechanic.availability,
             )
 
             self.all_assignments[relation_id] = Assignment(
@@ -116,7 +116,7 @@ class MechanicPartnerAssignmentSolver:
         for assignment in self.all_assignments.values():
             schedule = assignment.schedule
             schedule_days = schedule.num_days
-            schedule_promo_duration = schedule.promo_lenght
+            schedule_promo_duration = schedule.promo_length
             start_var = assignment.start
             duration_var = assignment.duration
             day_flags = schedule.get_day_flags_var()

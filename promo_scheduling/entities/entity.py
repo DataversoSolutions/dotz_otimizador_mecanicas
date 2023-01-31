@@ -52,11 +52,11 @@ class Schedule:
     # this example means a duration of 2 days, starting at day 2
     schedule_array: List[List[cp_model.IntVar]]
 
-    def __init__(self, name, model: cp_model.CpModel, num_days, promo_lenght):
-        self.promo_lenght = promo_lenght
+    def __init__(self, name, model: cp_model.CpModel, num_days, promo_length):
+        self.promo_length = promo_length
         self.num_days = num_days
         self.schedule_array = [
-            [model.NewBoolVar(f"{name}_[{i},{j}]") for i in range(promo_lenght)]
+            [model.NewBoolVar(f"{name}_[{i},{j}]") for i in range(promo_length)]
             for j in range(num_days)
         ]
 
