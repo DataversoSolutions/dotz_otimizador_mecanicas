@@ -8,36 +8,7 @@ parceiros:
     dias_possiveis: 9
     mecanicas:
       - id: DZ_4
-        dias_disponiveis: 4configuracoes_do_sistema:
-  mecanicas:
-    dias_duracao_minima: 3
-    dia_da_semana_inicial: domingo
-
-parceiros:
-  - id: AMAZON
-    dias_possiveis: 7
-    mecanicas:
-    - id: DZ_4
-      dias_disponiveis: 4
-
-  - id: Magazine Luiza.com
-    dias_possiveis: 7
-    mecanicas:
-    - id: DZ_4
-      dias_disponiveis: 4
-
-  - id: Americanas.com
-    dias_possiveis: 7
-    mecanicas:
-    - id: DZ_4
-      dias_disponiveis: 4
-
-  - id: Submarino
-    dias_possiveis: 7
-    mecanicas:
-    - id: DZ_4
-      dias_disponiveis: 4
-
+        dias_disponiveis: 4
   - id: Magazine Luiza.com
     dias_possiveis: 9
     mecanicas:
