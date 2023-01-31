@@ -29,11 +29,11 @@ class MechanicPartnerAssignmentSolver:
         self.all_assignments: Dict[str, Assignment] = {}
         self.zero_day_week_day = WEEKDAY_INDEX[system_settings.starting_week_day]
 
-    def create_promo_interval_var(self, relation_id, duration_horizon):
-        start_var = self.model.NewIntVar(0, duration_horizon, "start_" + relation_id)
-        end_var = self.model.NewIntVar(0, duration_horizon, "end_" + relation_id)
+    def create_promo_interval_var(self, relation_id, availability_horizon):
+        start_var = self.model.NewIntVar(0, availability_horizon, "start_" + relation_id)
+        end_var = self.model.NewIntVar(0, availability_horizon, "end_" + relation_id)
         duration_var = self.model.NewIntVar(
-            0, duration_horizon, "duration_" + relation_id
+            0, availability_horizon, "duration_" + relation_id
         )
         interval_var = self.model.NewIntervalVar(
             start_var, duration_var, end_var, "interval_" + relation_id
@@ -51,8 +51,8 @@ class MechanicPartnerAssignmentSolver:
         return is_active, not_is_active
 
     def create_variables(self) -> None:
-        duration_horizon = max(
-            promotion.mechanic.availability for promotion in self.possible_promotions
+        availability_horizon = max(
+            promotion.partner.availability for promotion in self.possible_promotions
         )
         for promotion in self.possible_promotions:
             partner = promotion.partner
@@ -66,7 +66,7 @@ class MechanicPartnerAssignmentSolver:
                 duration_var,
                 interval_var,
             ) = self.create_promo_interval_var(
-                relation_id=relation_id, duration_horizon=duration_horizon
+                relation_id=relation_id, availability_horizon=availability_horizon
             )
 
             is_active, not_is_active = self.create_promo_active_flag_var(
@@ -77,7 +77,7 @@ class MechanicPartnerAssignmentSolver:
                 name=relation_id,
                 model=self.model,
                 num_days=partner_availability,
-                promo_lenght=mechanic.availability,
+                promo_length=mechanic.availability,
             )
 
             self.all_assignments[relation_id] = Assignment(
@@ -99,7 +99,7 @@ class MechanicPartnerAssignmentSolver:
                 sum(
                     self.all_assignments[
                         f"{partner.name}_{mechanic.name}"
-                    ].interval.SizeExpr()
+                    ].duration
                     for mechanic in partner.mechanics
                 )
                 <= partner.availability
@@ -116,12 +116,14 @@ class MechanicPartnerAssignmentSolver:
         for assignment in self.all_assignments.values():
             schedule = assignment.schedule
             schedule_days = schedule.num_days
-            schedule_promo_duration = schedule.promo_lenght
+            schedule_promo_duration = schedule.promo_length
             start_var = assignment.start
             duration_var = assignment.duration
+            day_flags = schedule.get_day_flags_var()
+            # only one day active
+            self.model.AddAtMostOne(day_flags)
             for day in range(schedule_days):
                 duration_array = schedule.get_duration_array_at_day(day)
-                day_flags = schedule.get_day_flags_var()
                 # enforce the day_flags[start_var] == 1
                 self.model.AddMapDomain(var=start_var, bool_var_array=day_flags)
 
@@ -152,6 +154,14 @@ class MechanicPartnerAssignmentSolver:
                 <= possible_assignment.promotion.partner.availability
             )
 
+    def add_constraint_daily_promotions(self):
+        promotions_intervals = []
+        promotions_demands = []
+        for assignment in self.all_assignments.values():
+            promotions_intervals.append(assignment.interval)
+            promotions_demands.append(1)
+        self.model.AddCumulative(promotions_intervals, promotions_demands, self.system_settings.max_daily_promotions)
+
     def create_objective_function(self) -> None:
         self.model.Maximize(
             # we maximize the productivity (clients) of all promotions
@@ -180,6 +190,7 @@ class MechanicPartnerAssignmentSolver:
         self.add_constraint_no_overlapping_promotion_on_partner()
         self.add_constraint_min_duration()
         # self.add_constraint_promotion_end_before_availability_end()
+        self.add_constraint_daily_promotions()
         self.create_objective_function()
         self.status = self.solver.Solve(self.model)
 
